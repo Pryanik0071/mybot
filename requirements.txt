@@ -1,1 +1,2 @@
-python-telegram-bot[socks]
+python-telegram-bot[socks]==13.7
+ephem==4.0.0.2

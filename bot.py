@@ -1,4 +1,6 @@
 import logging
+from datetime import date
+import ephem
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import settings
 
@@ -17,6 +19,25 @@ def talk_to_me(update, context):
     update.message.reply_text(user_text)
 
 
+def position_planet_today(update, context):
+    date_today = str(date.today().strftime('%Y/%m/%d'))
+    planet_name = update.message.text.split()[-1]
+    planets_list = {
+        'Mars': ephem.Mars(date_today),  # Марс
+        'Mercury': ephem.Mercury(date_today),  # Меркурий
+        'Venus': ephem.Venus(date_today),  # Венера
+        'Jupiter': ephem.Jupiter(date_today),  # Юпитер
+        'Neptune': ephem.Neptune(date_today),  # Нептун
+        'Saturn': ephem.Saturn(date_today),  # Сатурн
+        'Uranus': ephem.Uranus(date_today),  # Уран
+        'Pluto': ephem.Pluto(date_today)  # Плутон
+    }
+    constellation = ephem.constellation(planets_list[planet_name])
+    constellation_short_name, constellation_name = constellation
+    update.message.reply_text(
+        f"""Сегодня планета {planet_name} в созвездии {constellation_name}""")
+
+
 # Функция, которая соединяется с платформой Telegram, "тело" нашего бота
 def main():
     # Создаем бота и передаем ему ключ для авторизации на серверах Telegram
@@ -24,6 +45,7 @@ def main():
 
     dp = mybot.dispatcher
     dp.add_handler(CommandHandler("start", greet_user))
+    dp.add_handler(CommandHandler("planet", position_planet_today))
     dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
     logging.info("Бот стартовал")
